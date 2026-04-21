@@ -1,91 +1,113 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const Evidencia = require('../moldes/Evidencia');
 
 // GET /api/evidencias
-router.get('/', (req, res) => {
-    const sql = 'SELECT * FROM evidencia';
-
-    db.query(sql, (error, resultados) => {
-        if (error){
-            console.log('ERROR EXACTO:', error);
-            return res.status(500).json({error: 'Error al consultar la base de datos'})
-        }
-        res.json(resultados)
-    })
-})
-
-//GET /api/evidencias/1
-router.get('/:id',  (req, res) => {
-    const { id } = req.params;
-    const sql = 'SELECT * FROM evidencia WHERE idevidencia = ?';
-
-    db.query(sql, [id], (error, resultados) => {
-        if(error) {
-            return res.status(404).json ({error:'evidencia no encontrada'});
-        }
-        res.json(resultado[0]);
-    })
-
-});
-
-//POST /api/evidencias
-router.post('/', (req, res) => {
-    const {nombre, url, fecha_limite, idcomponente, idaprendiz} = req.body;
-
-    if(!nombre) {
-        return res.status(400).json({ error:'El nombre es obligatorio'});
+router.get('/', async (req, res) => {
+    try {
+        const evidencias = await Evidencia.obtenerTodas();
+        res.json(evidencias);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al consultar' });
     }
-    const sql = `INSERT INTO evidencia (nombre, url, fecha_limite, idcomponente, idaprendiz) VALUE (?,?,?,?,?)`;
-    db.query(sql, [nombre, url, fecha_limite, idcomponente, idaprendiz], (error, resultado) => {
-        if(error){
-            return res.status(500).json({ error:'Error al crear la evidencia'});
-        }
-        res.status(201).json({
-            mensaje: 'Evidencia correctamente creada',
-            id:resultado.insertid
-        });
-
-    });
-
 });
 
-router.put('/:id', (req, res) =>{
-    const {id} = req.params
-    const { estatus, comentario, url_evidencia, url_clase, } = req.body;
-
-    const sql = `UPDATE evidencia
-                SET estatus = ?, comentario = ?, url_evidencia=?, url_clase = ?
-                WHERE idevidencia = ?`;
-    
-    db.query(sql, [estatus, comentario, url_evidencia, url_clase, id], (error, resultado) => {
-        if(error){
-            return res.status(500).json({error: 'Error al actualizar'});          
+// GET /api/evidencias/resumen
+router.get('/resumen', async (req, res) => {
+    try {
+        if (!req.session.usuario) {
+            return res.status(401).json({ error: 'No autorizado' });
         }
-        if(resultado.affectedRows === 0) {
-            return res.status(404).json({error:'Evidencia no encontrada'});
-        }
-        res.json({mensaje: 'Evidencia correctamente actualizada'});
-    });
 
+        //await Evidencia.actualizarVencidas(idAprendiz);
+        const resumen = await Evidencia.obtenerResumen(req.session.usuario.id);
+
+        res.json(resumen);
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({ error: 'Error al consultar resumen' });
+    }
 });
 
-//DELETE /api/evidencias
-
-router.delete('/:id', (req, res)=>{
-    const { id } = req.params;
-    const sql = 'DELETE FROM evidencia WHERE idevidencia = ?';
-
-    db.query(sql, [id], (error, resultado) => {
-        if (error){
-            return res.status(500).json({ error:'Error al eliminar',  detalle: error.message});
+// GET /api/evidencias/mis-evidencias
+router.get('/mis-evidencias', async (req, res) => {
+    try {
+        if (!req.session.usuario) {
+            return res.status(401).json({ error: 'No autorizado' });
         }
-        if (resultado.affectedRows === 0){
-            return res.status(404).json({erro: 'Evidencia no encontrada'});
-        }
-        res.json({mensaje:'Evidencia eliminada correctamente'});
-    });
+
+        //await Evidencia.actualizarVencidas(idAprendiz);
+        const evidencias = await Evidencia.obtenerPorAprendiz(req.session.usuario.id);
+
+        res.json(evidencias);
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({ error: 'Error al consultar evidencias' });
+    }
+});
+
+// GET /api/evidencias/:id  ← siempre al final
+router.get('/:id', async (req, res) => {
+    try {
+        const evidencia = await Evidencia.obtenerPorId(req.params.id);
+        if (!evidencia) return res.status(404).json({ error: 'Evidencia no encontrada' });
+        res.json(evidencia);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al consultar' });
+    }
+});
+
+// POST /api/evidencias
+router.post('/', async (req, res) => {
+    try {
+        console.log('Session ID:', req.sessionID);      
+        console.log('Session completa:', req.session);    
+        console.log('Usuario en sesión:', req.session.usuario);
+
+        console.log('1. Body recibido:', req.body);          
+
+        const { nombre, url, fecha_limite, url_material, url_clase } = req.body;
+        if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
+
+        console.log('3. Nombre válido, tomando idaprendiz...');
+
+        // Toma el idaprendiz de la sesión
+        const idaprendiz = req.session.usuario.id;
+        console.log('4. idaprendiz:', idaprendiz);     
+
+        const evidencia = new Evidencia(nombre, url, fecha_limite, idaprendiz, url_material, url_clase);
+        console.log('5. Objeto creado, guardando...'); 
+
+        const id = await evidencia.guardar();
+        console.log('6. Guardado con id:', id); 
+
+        res.status(201).json({ mensaje: 'Evidencia creada correctamente', id });
+    } catch (error) {
+        console.log('ERROR POST:', error);
+        res.status(500).json({ error: 'Error al crear la evidencia' });
+    }
+});
+
+// PUT /api/evidencias/:id
+router.put('/:id', async (req, res) => {
+    try {
+        const filas = await Evidencia.actualizar(req.params.id, req.body);
+        if (filas === 0) return res.status(404).json({ error: 'Evidencia no encontrada' });
+        res.json({ mensaje: 'Evidencia actualizada correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar' });
+    }
+});
+
+// DELETE /api/evidencias/:id
+router.delete('/:id', async (req, res) => {
+    try {
+        const filas = await Evidencia.eliminar(req.params.id);
+        if (filas === 0) return res.status(404).json({ error: 'Evidencia no encontrada' });
+        res.json({ mensaje: 'Evidencia eliminada correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar' });
+    }
 });
 
 module.exports = router;
-

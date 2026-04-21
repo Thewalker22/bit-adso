@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/frontend/css/forms.css">
+    <title>Crear usuario</title>
+</head>
+<body>
+
+    <section>
+        <h2>CREAR USUARIO</h2>
+        <form id="form-registro">
+           <table>
+            <tr>
+                <td>
+                    Nombre y apellido
+                </td>
+                <td>
+                    <label for="nommbre"></label>
+                    <input type="text" name="nombre" id="nombre" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Nombre de usuario
+                </td>
+                <td>
+                    <label for="usuario"></label>
+                    <input type="text" name="usuario" id="usuario" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Programa
+                </td>
+                <td>
+                    <select name="idprograma" id="idprograma">
+                        <option value="">Seleciona un programa</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Contraseña
+                </td>
+                <td>
+                    <label for="contrasena"></label>
+                    <input type="password" name="contrasena" id="contrasena" required>
+                </td>
+            </tr>
+           </table>
+           <button type="button" id="btn-registro">Registrar</button>
+        </form>
+    </section>
+    <script src="/js/registro.js"></script>
+</body>
+</html>

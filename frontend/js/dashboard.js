@@ -1,9 +1,58 @@
+
 const API = '/api/evidencias';
- 
+
+// Cargar el nombre del usuario en sesión
+
+const cargarSesion = async () =>{
+    try{
+        const respuesta = await fetch('/api/usuarios/sesion',{
+        credentials: 'include' 
+        });
+       
+        const datos = await respuesta.json();
+
+        if(!respuesta.ok){
+            //Si no hay sesisón redirie al login
+            window.location.href = '/login.html';
+            return;
+        }
+        document.getElementById('nombre-usuario').textContent = datos.nombre;
+
+    }catch(error){
+        console.log('Error:, error');
+    }
+};
+
+//Cargar resumen conteos estatus
+const cargarResumen = async () =>{
+    try{
+        const respuesta = await fetch(`${API}/resumen`,{
+        credentials: 'include'
+        });
+        const resumen = await respuesta.json();
+
+        document.getElementById('tabla-resumen').innerHTML = `
+        <tr>
+            <td>${resumen.total}</td>
+            <td>${resumen.enviadas}</td>
+            <td>${resumen.pendientes}</td>
+            <td>${resumen.vencidas}</td>
+        </tr>
+        `;
+    
+    }catch(error){
+        console.log('Error:', error);
+    }
+
+};
+
+//Cargar evidencias según el usuario
 //----------LEER----------------------------------
 const obtenerEvidencias = async () => {
     try {
-        const respuesta = await fetch(API);
+        const respuesta = await fetch(`${API}/mis-evidencias`,{
+        credentials: 'include'
+        });
         const evidencias = await respuesta.json();
         mostrarEvidencias(evidencias);
     } catch (error) {
@@ -20,7 +69,7 @@ const mostrarEvidencias = (evidencias) => {
     evidencias.forEach((ev, index) => {
         const fila = document.createElement('tr');
         fila.id = `fila-${ev.idevidencia}`;
-       // fila.dataset.idclase = ev.idclase ?? ''; 
+       //  fila.dataset.idclase = ev.idclase ?? ''; 
  
         const fechaFormateada = ev.fecha_limite
             ? new Date(ev.fecha_limite).toLocaleString().slice(0, 16) : '';
@@ -55,7 +104,9 @@ const mostrarEvidencias = (evidencias) => {
 //--------Activar edición inline-----------------------
 const activarEdicion = async (id) => {
     try {
-        const respuesta = await fetch(`${API}/${id}`);
+        const respuesta = await fetch(`${API}/${id}`,{
+        credentials: 'include'
+        });
         const ev = await respuesta.json();
  
         const fechaFormateada = ev.fecha_limite
@@ -108,13 +159,14 @@ const guardarEdicionInline = async (id) => {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                nombre,
+                nombre: document.getElementById(`inp-nombre-${id}`).value,
                 url:          document.getElementById(`inp-url-${id}`).value,
                 fecha_limite: document.getElementById(`inp-fecha-${id}`).value,
                 estatus:      document.getElementById(`inp-estatus-${id}`).value,
                 url_material: document.getElementById(`inp-url-material-${id}`).value,
                 url_clase: document.getElementById(`inp-url-clase-${id}`).value
-            })
+            }),
+            credentials: 'include'
         });
  
         obtenerEvidencias();
@@ -141,15 +193,15 @@ const crearEvidencia = async () => {
         await fetch(API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, url, fecha_limite, url_material, url_clase,  idcomponente: 1 }),
+            body: JSON.stringify({ nombre, url, fecha_limite, url_material, url_clase }),
             credentials: 'include'
         });
  
         document.getElementById('input-nombre').value = '';
         document.getElementById('input-url').value = '';
         document.getElementById('input-fecha').value = '';
-        document.getElementById('input-url-clase').value = '';
         document.getElementById('input-url-material').value = '';
+        document.getElementById('input-url-clase').value = '';
       
  
         obtenerEvidencias();
@@ -165,7 +217,8 @@ const entregarEvidencia = async (id) => {
         await fetch(`${API}/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ estatus: 'enviada' })
+            body: JSON.stringify({ estatus: 'enviada' }),
+            credentials: 'include'
         });
         obtenerEvidencias();
     } catch (error) {
@@ -177,16 +230,27 @@ const entregarEvidencia = async (id) => {
 const eliminarEvidencia = async (id) => {
     if (!confirm('¿Seguro que quieres eliminar esta evidencia?')) return;
     try {
-        await fetch(`${API}/${id}`, { method: 'DELETE' });
+        await fetch(`${API}/${id}`, { method: 'DELETE' ,
+        credentials: 'include'
+    });
         obtenerEvidencias();
     } catch (error) {
         console.error('Error:', error);
     }
 };
  
+document.getElementById('btn-logout').addEventListener('click', async ()=>{
+    await fetch('/api/usuarios/logout', {method:'POST'});
+    window.location.href = '/login.html';
+});
+
 //-------Eventos-----------------------
 document.getElementById('btn-guardar').addEventListener('click', crearEvidencia);
  
 //-------Iniciar-----------------------
+cargarSesion();
+cargarResumen();
 obtenerEvidencias();
+
+
  
