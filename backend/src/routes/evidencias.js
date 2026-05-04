@@ -18,11 +18,12 @@ router.get('/resumen', async (req, res) => {
         if (!req.session.usuario) {
             return res.status(401).json({ error: 'No autorizado' });
         }
+        const idAprendiz = req.session.usuario.id;
 
-        //await Evidencia.actualizarVencidas(idAprendiz);
-        const resumen = await Evidencia.obtenerResumen(req.session.usuario.id);
-
+        await Evidencia.actualizarVencida(idAprendiz);
+        const resumen = await Evidencia.obtenerResumen(idAprendiz);
         res.json(resumen);
+        
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({ error: 'Error al consultar resumen' });

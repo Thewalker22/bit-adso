@@ -244,6 +244,8 @@ document.getElementById('btn-logout').addEventListener('click', async ()=>{
     window.location.href = '/login.html';
 });
 
+
+console.log(multi);
 //-------Eventos-----------------------
 document.getElementById('btn-guardar').addEventListener('click', crearEvidencia);
  

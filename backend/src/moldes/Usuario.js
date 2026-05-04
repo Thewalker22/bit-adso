@@ -13,7 +13,7 @@ class usuario {
     // Crea usuario nuevo (registro)
 
     async guardar() {
-        const hash = await bcrypt.hash(this.contraseña, 10); // ← bcrypt correcto
+        const hash = await bcrypt.hash(this.contraseña, 10); 
         return new Promise((resolve, reject) => {
             const sql = `INSERT INTO aprendiz (nombre, usuario, contraseña, idprograma)
                          VALUES (?, ?, ?, ?)`; 

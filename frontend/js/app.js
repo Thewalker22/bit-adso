@@ -184,6 +184,10 @@ const eliminarEvidencia = async (id) => {
     }
 };
  
+const numbers = [1,2,3,4];
+const multi = numbers.map(n => n*2);
+console.log(multi);
+
 //-------Eventos-----------------------
 document.getElementById('btn-guardar').addEventListener('click', crearEvidencia);
  

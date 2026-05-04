@@ -102,9 +102,9 @@ class Evidencia {
             const sql = 
             `SELECT
                 COUNT(*) AS total,
-                SUM(estatus = 'enviada') AS enviadas,
-                SUM(estatus = 'pendiente') AS pendientes,
-                SUM(estatus = 'vencida') AS vencidas
+                COALESCE (SUM(estatus = 'enviada'), 0) AS enviadas,
+                COALESCE (SUM(estatus = 'pendiente'), 0) AS pendientes,
+                COALESCE (SUM(estatus = 'vencida'), 0) AS vencidas
             FROM evidencia
             WHERE idaprendiz = ?`;
         db.query(sql,[idaprendiz], (error, resultados) =>{
