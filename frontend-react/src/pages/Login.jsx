@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {login} from '../services/usuariosService'
+
 
 function Login (){
     const [usuario, setUsuario]      = useState('')
@@ -19,13 +21,7 @@ function Login (){
             setCargando(true)
             setError(null)
     
-            const respuesta = await fetch('/api/usuarios/login' , {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usuario, contraseña: contrasena}),
-                credentials: 'include'
-            })
-            const resultado = await respuesta.json()
+            const respuesta = await login(usuario, contrasena) 
     
             if (!respuesta.ok){
                 setError(resultado.error)
@@ -34,6 +30,7 @@ function Login (){
     
             //Login exitoso - redirige al dashboard
             navigate('/dashboard')
+            
         }catch (err) {
             setError('Error al conectar con el servidor')   
         }finally{

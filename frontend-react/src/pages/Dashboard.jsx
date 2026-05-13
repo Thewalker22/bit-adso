@@ -5,6 +5,8 @@ import camaraIcon from '../assets/camara-de-video.gif'
 import ResumenCards from '../components/ResumenCards'
 import TablaEvidencias from '../components/TablaEvidencias'
 import FormEvidencia from "../components/FormEvidencias"
+import { obtenerMisEvidencias, obtenerResumen, actualizarEvidencia } from "../services/evidenciasServices"
+import {obtenerSesion, logout} from"../services/usuariosService"
 
 function Dashboard() {
     const [usuario,    setUsuario]    = useState(null)
@@ -18,20 +20,24 @@ function Dashboard() {
     useEffect(() => {
       const cargarTodo = async () => {
         try {
-          const resSesion = await fetch('/api/usuarios/sesion', {
-            credentials: 'include'
-          })
-          if (!resSesion.ok) { navigate('/login'); return }
-          setUsuario(await resSesion.json())
-  
-          const [resResumen, resEvidencias] = await Promise.all([
-            fetch('/api/evidencias/resumen',        { credentials: 'include' }),
-            fetch('/api/evidencias/mis-evidencias', { credentials: 'include' })
+          const sesion = await obtenerSesion()
+          if (!sesion.ok) { navigate('/login'); return }
+          setUsuario(sesion.data) 
+         
+          const [resumen, evidencias] = await Promise.all([
+            obtenerResumen(),
+            obtenerMisEvidencias()
           ])
-          setResumen(await resResumen.json())
-          setEvidencias(await resEvidencias.json())
+          console.log('RESUMEN:', resumen)
+          console.log('EVIDENCIAS:', evidencias)
+
+          setResumen(resumen)
+          setEvidencias(evidencias)
+        
   
         } catch (error) {
+          
+          console.log('Error exacto:', err.message)
           console.log('Error:', error)
         } finally {
           setCargando(false)
@@ -42,37 +48,26 @@ function Dashboard() {
 
     const entregarEvidencia = async (id) => {
         try {
-          await fetch(`/api/evidencias/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ estatus: 'enviada' }),
-            credentials: 'include'
-          })
-      
-          // Recargar resumen y evidencias después de entregar
-          const [resResumen, resEvidencias] = await Promise.all([
-            fetch('/api/evidencias/resumen',        { credentials: 'include' }),
-            fetch('/api/evidencias/mis-evidencias', { credentials: 'include' })
-          ])
-          setResumen(await resResumen.json())
-          setEvidencias(await resEvidencias.json())
-      
+
+         //Actualiza evidencia con estatus enviada y recarga datos
+          await actualizarEvidencia(id, {estatus:'enviada'})
+          recargarDatos()
+
         } catch (error) {
           console.log('Error:', error)
         }
-      }
+    }
 
     //Función para recargar datos después de crear un evidencia
-
     const recargarDatos = async () => {
       try{
-        const [resResumen, resEvidencias] = await Promise.all([
-          fecth('/api/evidencias/resumen',  {credentials:'include'}),
-          fetch('/api/evidencias/mis-evidencias', {credentials:'include'})
+        const [resumen, evidencias] = await Promise.all([
+         obtenerResumen(),
+         obtenerMisEvidencias()
         ])
 
-        setResumen(await resResumen.json())
-        setEvidencias(await resEvidencias.json())
+        setResumen(resumen)
+        setEvidencias(evidencias)
       }catch (error) {
         console.log('Error:', error)
       }
@@ -83,25 +78,19 @@ function Dashboard() {
     const editarEvidencia = async (id, datos) => {
       try{
       
-        await fetch(`/api/evidencias/${id}`,{ 
-        method:'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body:JSON.stringify(datos),
-        credentials:'include'
-        })
-
+        await actualizarEvidencia(id, datos)
         setEvidenciaSeleccionada(null)
         recargarDatos()
+
+      
       }catch (error) {
         console.log('Error:', error)
       }
     }
 
     const cerrarSesion = async () => {
-      await fetch('/api/usuarios/logout', {
-        method: 'POST',
-        credentials: 'include'
-      })
+      await logout() 
+       
       navigate('/login')
     }
   
@@ -129,7 +118,7 @@ function Dashboard() {
       <TablaEvidencias
         evidencias={evidencias}
         onEntregar={entregarEvidencia}
-        onEditar={(ev) => setEvidenciaSeleccionada(ev)}
+        onEditar={editarEvidencia}
       />
       </div>
     )
