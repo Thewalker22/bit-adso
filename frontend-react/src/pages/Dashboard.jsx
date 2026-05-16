@@ -24,20 +24,18 @@ function Dashboard() {
           if (!sesion.ok) { navigate('/login'); return }
           setUsuario(sesion.data) 
          
-          const [resumen, evidencias] = await Promise.all([
-            obtenerResumen(),
-            obtenerMisEvidencias()
-          ])
+          const resumen    = await obtenerResumen()
+          const evidencias = await obtenerMisEvidencias()
+
           console.log('RESUMEN:', resumen)
           console.log('EVIDENCIAS:', evidencias)
 
           setResumen(resumen)
           setEvidencias(evidencias)
-        
-  
+          
         } catch (error) {
           
-          console.log('Error exacto:', err.message)
+          console.log('Error exacto:', error.message)
           console.log('Error:', error)
         } finally {
           setCargando(false)
@@ -97,29 +95,33 @@ function Dashboard() {
     if (cargando) return <p>Cargando...</p>
   
     return (
-      <div>
-        {/* Encabezado */}
-        <div>
-          <h2>Bienvenido, {usuario?.nombre}</h2>
-          <button onClick={cerrarSesion}>Cerrar sesión</button>
-        </div>
-  
-        {/* Resumen — componente separado */}
-        {resumen && <ResumenCards resumen={resumen} />}
+      <div className="container-fluid d-flex justify-content-center align-items-center  login-container pt-5">
 
-        {/* Formulario para crear evidencia */}
-      <FormEvidencia 
-      onCrear={recargarDatos} 
-      onEditar={editarEvidencia}
-      evidencia={evidenciaSeleccionada}
-      />
-     
-         {/*Se pasa onEntregar como prop */}
-      <TablaEvidencias
-        evidencias={evidencias}
-        onEntregar={entregarEvidencia}
-        onEditar={editarEvidencia}
-      />
+        <div className="d-flex flex-column gap-5" >
+              {/* Encabezado */}
+              <div className="d-flex">
+                <h2>Bienvenido, {usuario?.nombre}</h2>
+                <button className="btn-crear-evidencia" onClick={cerrarSesion}>Cerrar sesión</button>
+              </div>
+        
+              {/* Resumen — componente separado */}
+              {resumen && <ResumenCards resumen={resumen} />}
+
+              {/* Formulario para crear evidencia */}
+            <FormEvidencia 
+            onCrear={recargarDatos} 
+            onEditar={editarEvidencia}
+            evidencia={evidenciaSeleccionada}
+            />
+          
+              {/*Se pasa onEntregar como prop */}
+            <TablaEvidencias
+              evidencias={evidencias}
+              onEntregar={entregarEvidencia}
+              onEditar={editarEvidencia}
+            />
+        </div>
+
       </div>
     )
 

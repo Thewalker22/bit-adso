@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+import '../styles/dashboard.css'
 function TablaEvidencias({ evidencias, onEntregar, onEditar }) {
   // Guarda el id de la fila en modo edición — null = ninguna
   const [editandoId, setEditandoId] = useState(null)
@@ -33,9 +33,9 @@ function TablaEvidencias({ evidencias, onEntregar, onEditar }) {
   }
 
   return (
-    <div>
-      <h3>Mis evidencias</h3>
-      <table border="1">
+    <div className="tabla-container">
+      <h3 className="tabla-titulo">Mis evidencias</h3>
+      <table className="table table-hover align-middle tabla-evidencias">
         <thead>
           <tr>
             <th>#</th>
@@ -57,12 +57,14 @@ function TablaEvidencias({ evidencias, onEntregar, onEditar }) {
                   <td>{index + 1}</td>
                   <td>
                     <input
+                      className="form-control"
                       value={datosEdicion.nombre}
                       onChange={(e) => setDatosEdicion({ ...datosEdicion, nombre: e.target.value })}
                     />
                   </td>
                   <td>
                     <input
+                      className="form-control"
                       type='datetime-local'
                       value={datosEdicion.fecha_limite}
                       onChange={(e) => setDatosEdicion({ ...datosEdicion, fecha_limite: e.target.value })}
@@ -80,6 +82,7 @@ function TablaEvidencias({ evidencias, onEntregar, onEditar }) {
                   </td>
                   <td>
                     <input
+                      className="form-control"
                       type='url'
                       value={datosEdicion.url}
                       onChange={(e) => setDatosEdicion({ ...datosEdicion, url: e.target.value })}
@@ -87,6 +90,7 @@ function TablaEvidencias({ evidencias, onEntregar, onEditar }) {
                   </td>
                   <td>
                     <input
+                      className="form-control"
                       type='url'
                       value={datosEdicion.url_material}
                       onChange={(e) => setDatosEdicion({ ...datosEdicion, url_material: e.target.value })}
@@ -94,14 +98,15 @@ function TablaEvidencias({ evidencias, onEntregar, onEditar }) {
                   </td>
                   <td>
                     <input
+                      className="form-control"
                       type='url'
                       value={datosEdicion.url_clase}
                       onChange={(e) => setDatosEdicion({ ...datosEdicion, url_clase: e.target.value })}
                     />
                   </td>
-                  <td>
-                    <button onClick={guardarEdicion}>💾 Guardar</button>
-                    <button onClick={cancelarEdicion}>❌ Cancelar</button>
+                  <td className="btn-acciones">
+                    <button className="btn btn-success btn-sm" onClick={guardarEdicion}>💾 Guardar</button>
+                    <button className="btn btn-danger btn-sm" onClick={cancelarEdicion}>❌ Cancelar</button>
                   </td>
                 </>
               ) : (
@@ -115,17 +120,18 @@ function TablaEvidencias({ evidencias, onEntregar, onEditar }) {
                       : 'Sin fecha'}
                   </td>
                   <td>{ev.estatus}</td>
-                  <td><a href={ev.url ?? '#'} target="_blank">Entregar</a></td>
-                  <td><a href={ev.url_material ?? '#'} target="_blank">M</a></td>
-                  <td><a href={ev.url_clase ?? '#'} target="_blank">🎓</a></td>
-                  <td>
+                  <td><a  className="btn btn-outline-primary btn-sm" href={ev.url ?? '#'} target="_blank">Entregar</a></td>
+                  <td><a  className="btn btn-outline-primary btn-sm" href={ev.url_material ?? '#'} target="_blank">📗</a></td>
+                  <td><a  className="btn btn-outline-primary btn-sm" href={ev.url_clase ?? '#'} target="_blank"> ▶️ </a></td>
+                  <td className="btn-acciones">
                     <button
+                      className="btn btn-primary btn-sm m-1"
                       onClick={() => onEntregar(ev.idevidencia)}
                       disabled={ev.estatus === 'enviada' ? true : false}
                     >
                       {ev.estatus === 'enviada' ? '✅ Enviada' : 'Entregar'}
                     </button>
-                    <button onClick={() => activarEdicion(ev)}>
+                    <button className="btn btn-warning btn-sm" onClick={() => activarEdicion(ev)}>
                       Editar
                     </button>
                   </td>

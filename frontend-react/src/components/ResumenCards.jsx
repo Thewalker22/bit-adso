@@ -1,24 +1,42 @@
+import '../styles/resumen.css'
+
 function ResumenCards({ resumen }) {
     return (
-        <table border={1}>
-        <thead>
-            <tr>
-                <th><strong>Total</strong></th>
-                <th><strong>Evidencias</strong></th>
-                <th><strong>Pendientes</strong></th>
-                <th><strong>Vencidas</strong></th>
-            </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><p>{resumen.total}</p></td>
-            <td><p>{resumen.enviadas}</p></td>
-            <td><p>{resumen.pendientes}</p></td>
-            <td><p>{resumen.vencidas}</p></td>
-          </tr>
-        </tbody>
-    
-    </table>
+      <div className="resumen-grid">
+
+      <div className="resumen-card total-card">
+  
+          <h3>Total</h3>
+  
+          <p>{resumen.total}</p>
+  
+      </div>
+  
+      <div className="resumen-card enviadas-card">
+  
+          <h3>Eviadas</h3>
+  
+          <p>{resumen.enviadas}</p>
+  
+      </div>
+  
+      <div className="resumen-card pendientes-card">
+  
+          <h3>Pendientes</h3>
+  
+          <p>{resumen.pendientes}</p>
+  
+      </div>
+  
+      <div className="resumen-card vencidas-card">
+  
+          <h3>Vencidas</h3>
+  
+          <p>{resumen.vencidas}</p>
+  
+      </div>
+  
+  </div>
     )
   }
   

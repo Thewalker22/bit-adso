@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { registrarUsuario } from '../services/usuariosService'
+import {cargarProg}  from '../services/usuariosService'
 
 function Registro() {
   const [nombre,      setNombre]      = useState('')
@@ -15,18 +17,24 @@ function Registro() {
   // Carga los programas disponibles al abrir el formulario
   useEffect(() => {
     const cargarProgramas = async () => {
-      try {
-        const res = await fetch('http://localhost:3000/api/programas')
-        const datos = await res.json()
-        setProgramas(datos)
-      } catch (err) {
-        console.log('Error cargando programas:', err)
-      }
+        try {
+            const datos = await cargarProg()
+            console.log(datos)
+
+            if(datos.ok){
+              console.log('Tipo de datos:', typeof datos.data, datos.data)
+              setProgramas(datos.data)
+            }
+        } catch (err) {
+
+            console.log('Error cargando programas:', err)
+
+        }
     }
     cargarProgramas()
-  }, [])
+}, [])
 
-  const registrarUsuario = async () => {
+  const registrarusuario = async () => {
     // Validar campos vacíos
     if (!nombre || !usuario || !contrasena || !idprograma) {
       setError('Todos los campos son obligatorios')
@@ -44,25 +52,16 @@ function Registro() {
       setCargando(true)
       setError(null)
 
-      const respuesta = await fetch('/api/usuarios/registro', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre,
-          usuario,
-          contraseña: contrasena,
-          idprograma
-        }),
-        credentials: 'include'
+      const resultado = await registrarUsuario({
+        nombre,
+        usuario,
+        contraseña: contrasena,
+        idprograma
       })
-
-      const resultado = await respuesta.json()
-
-      if (!respuesta.ok) {
-        setError(resultado.error)
-        return
-      }
-
+         
+      if (!resultado.ok) {
+        setError(resultado.data?.error)  
+    }
       // Registro exitoso → redirige al login
       navigate('/login')
 
@@ -75,68 +74,80 @@ function Registro() {
   }
 
   return (
-    <div>
-      <h2>Registro de aprendiz</h2>
+    <div className="container-fluid d-flex justify-content-center align-items-center vh-100 login-container">
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div className="card shadow p-4" style={{ width: '400px' }}>
 
-      <div>
-        <label>Nombre completo</label>
-        <input
-          type='text'
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          placeholder='Tu nombre completo'
-        />
+          <h2 className="text-center mb-4">Registro de aprendiz</h2>
+
+          {error && <div className="alert alert-danger" >{error}</div>}
+
+          <div className="mb-3">
+            <label className="form-label">Nombre completo</label>
+            <input
+              type='text'
+              className="form-control"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder='Tu nombre completo'
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Usuario</label>
+            <input
+              type='text'
+              className="form-control"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+              placeholder='Nombre de usuario'
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Contraseña</label>
+            <input
+              type='password'
+              className="form-control"
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
+              placeholder='Tu contraseña'
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Programa</label>
+            <select
+               className="form-control"
+              value={idprograma}
+              onChange={(e) => setIdprograma(e.target.value)}
+            >
+              <option value=''>Selecciona un programa <span></span></option>
+              {programas.map(p => (
+                <option key={p.idprograma} value={p.idprograma}>
+                  {p.nombre} — Ficha: {p.ficha}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button 
+            className="btn btn-primary w-100 mt-4" 
+          onClick={registrarusuario} disabled={cargando}>
+            {cargando ? 'Registrando...' : 'Crear cuenta'}
+          </button>
+
+          <p className="text-center mt-3">
+            ¿Ya tienes cuenta? <span
+              style={{ color: 'blue', cursor: 'pointer' }}
+              onClick={() => navigate('/login')}
+            >
+              Inicia sesión aquí
+            </span>
+          </p>
+
       </div>
 
-      <div>
-        <label>Usuario</label>
-        <input
-          type='text'
-          value={usuario}
-          onChange={(e) => setUsuario(e.target.value)}
-          placeholder='Nombre de usuario'
-        />
-      </div>
-
-      <div>
-        <label>Contraseña</label>
-        <input
-          type='password'
-          value={contrasena}
-          onChange={(e) => setContrasena(e.target.value)}
-          placeholder='Tu contraseña'
-        />
-      </div>
-
-      <div>
-        <label>Programa</label>
-        <select
-          value={idprograma}
-          onChange={(e) => setIdprograma(e.target.value)}
-        >
-          <option value=''>Selecciona un programa</option>
-          {programas.map(p => (
-            <option key={p.idprograma} value={p.idprograma}>
-              {p.nombre} — Ficha: {p.ficha}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <button onClick={registrarUsuario} disabled={cargando}>
-        {cargando ? 'Registrando...' : 'Crear cuenta'}
-      </button>
-
-      <p>
-        ¿Ya tienes cuenta? <span
-          style={{ color: 'blue', cursor: 'pointer' }}
-          onClick={() => navigate('/login')}
-        >
-          Inicia sesión aquí
-        </span>
-      </p>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useState} from 'react'
+import '../styles/form.css'
 
 function FormEvidencia ({onCrear, onEditar, evidencia}) {
  const [nombre,         setNombre]          =useState('')
@@ -78,58 +79,111 @@ const handleCrear = async () => {
   }
 
 return (
-   <div>
-    <h3>Nueva evidencia</h3>
+  <div className="form-evidencia-container">
 
-    {error && <p style={{color:'red'}}> {error}</p>}
-    <div>
-        <label>Nombre</label>
-        <input
-        type="text" 
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        placeholder='Nombre de la evidencia'
-         />
-    </div>
+  <div className="form-evidencia-card">
 
-    <div>
-        <label>Url de entrega</label>
-        <input 
-        type="url"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        placeholder='https//...'
-        />
-    </div>
+      <h3 className="form-evidencia-title">
+          Nueva evidencia
+      </h3>
 
-    <div>
-        <label> Fecha limite </label>
-        <input 
-        type="datetime-local"
-        value={fechaLimite}
-        onChange={(e) => setFechaLimite(e.target.value)}
-         />
-    </div>
+      {error && (
+          <div className="alert alert-danger">
+              {error}
+          </div>
+      )}
 
-    <div>
-        <label>Url Material</label>
-        <input 
-        type="url" 
-        value={urlMaterial}
-        onChange={(e) => setUrlMaterial(e.target.value)}
-        />
-    </div>
+      <div className="mb-3">
 
-    <div>Url clase</div>
-    <input 
-    type="url"
-    value={urlClase}
-    onChange={(e) => setUrlClase(e.target.value)}
-    />
+          <label className="form-label">
+              Nombre
+          </label>
 
-    <button onClick={handleCrear}> Crear evidencia</button>
+          <input
+              type="text"
+              className="form-control"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="Nombre de la evidencia"
+          />
 
-   </div>
+      </div>
+
+      <div className="mb-3">
+
+          <label className="form-label">
+              URL de entrega
+          </label>
+
+          <input
+              type="url"
+              className="form-control"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://..."
+          />
+
+      </div>
+
+      <div className="mb-3">
+
+          <label className="form-label">
+              Fecha límite
+          </label>
+
+          <input
+              type="datetime-local"
+              className="form-control"
+              value={fechaLimite}
+              onChange={(e) => setFechaLimite(e.target.value)}
+          />
+
+      </div>
+
+      <div className="mb-3">
+
+          <label className="form-label">
+              URL Material
+          </label>
+
+          <input
+              type="url"
+              className="form-control"
+              value={urlMaterial}
+              onChange={(e) => setUrlMaterial(e.target.value)}
+              placeholder="https://..."
+          />
+
+      </div>
+
+      <div className="mb-4">
+
+          <label className="form-label">
+              URL Clase
+          </label>
+
+          <input
+              type="url"
+              className="form-control"
+              value={urlClase}
+              onChange={(e) => setUrlClase(e.target.value)}
+              placeholder="https://..."
+          />
+
+      </div>
+
+      <button
+          className="btn-crear-evidencia"
+          onClick={handleCrear}
+      >
+
+          Crear evidencia
+
+      </button>
+
+  </div>
+
+</div>
 )
 }
 export default FormEvidencia

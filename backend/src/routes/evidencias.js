@@ -7,6 +7,7 @@ router.get('/', async (req, res) => {
     try {
         const evidencias = await Evidencia.obtenerTodas();
         res.json(evidencias);
+        console.log(evidencias);
     } catch (error) {
         res.status(500).json({ error: 'Error al consultar' });
     }
@@ -21,6 +22,7 @@ router.get('/resumen', async (req, res) => {
         const idAprendiz = req.session.usuario.id;
 
         await Evidencia.actualizarVencida(idAprendiz);
+        
         const resumen = await Evidencia.obtenerResumen(idAprendiz);
         res.json(resumen);
         
@@ -41,6 +43,7 @@ router.get('/mis-evidencias', async (req, res) => {
         const evidencias = await Evidencia.obtenerPorAprendiz(req.session.usuario.id);
 
         res.json(evidencias);
+        console.log(evidencias)
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({ error: 'Error al consultar evidencias' });

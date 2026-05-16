@@ -29,7 +29,8 @@ router.post('/registro', async (req, res) => {
         return res.status(400).json({ error: 'El nombre de usuario ya existe' });
     }
     //console.log('ERROR REGISTRO:', error);
-    res.status(500).json({ error: 'Error al crear el usuario PRUEBA' });
+    res.status(500).json({ error:error.message })
+    //res.status(500).json({ error: 'Error al crear el usuario PRUEBA' });
     }
 });
 
