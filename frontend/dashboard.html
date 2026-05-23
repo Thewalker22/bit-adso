@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+
+    <h2>Bienvenido, <span id="nombre-usuario"></span></h2>
+    <button id="btn-logout">Cerrar sesión</button>
+
+    <!-- Sección 1: Resumen -->
+    <h3>Resumen de evidencias</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Total</th>
+                <th>Enviadas</th>
+                <th>Pendientes</th>
+                <th>Vencidas</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-resumen"></tbody>
+    </table>
+
+    <!-- Sección 2: Tabla de evidencias -->
+    <h3>Mis evidencias</h3>
+    <!------sección creación de evidencias------>
+    <section id="seccion-formulario">
+        <h2>Nueva evidencia</h2>
+        <input type="text" id="input-nombre" placeholder="Nombre de la evidencia">
+        <input type="url" id="input-url" placeholder="URL entrega">
+        <input type="datetime-local" id="input-fecha" placeholder="Fecha entrega">
+        <input type="url" id="input-url-clase" placeholder="URL clase">
+        <input type="url" id="input-url-material" placeholder="URL material">
+        <button id="btn-guardar">Guardar evidencia</button>
+    </section>
+  
+
+     <!---------Tabla de evidencias------------>
+    
+     <section id="section-tabla">
+        <h2>Mis evidencias</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>url</th>
+                    <th>Fecha limite</th>
+                    <th>Estatus</th>
+                    <th>Material aprendizaje</th>
+                    <th>clase</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-body">
+                <!------En esta sección se injecta las filas-->
+            </tbody>
+        </table>
+     </section>
+
+    <script src="/js/dashboard.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
